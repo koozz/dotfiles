@@ -1,0 +1,53 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install Helm here
+HELM2="$HOME/.bin/helm2"
+HELM3="$HOME/.bin/helm3"
+
+# Version legacy
+HELM2VERSION=v2.17.0
+
+# Version online
+URL="https://github.com/helm/helm/releases"
+HELM3VERSION="$(curl --head -s "${URL}/latest" | grep -i "^Location:" | grep -oe 'v3\.[[:digit:]]*\.[[:digit:]]*')"
+
+# Get the current version
+HELM2CURRENT=""
+if [[ -x "$HELM2" ]]; then
+	HELM2CURRENT=$($HELM2 version --short --client | grep -oe 'v[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')
+fi
+HELM3CURRENT=""
+if [[ -x "$HELM3" ]]; then
+	HELM3CURRENT=$($HELM3 version --short | grep -oe 'v[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')
+fi
+
+# Install if not the required version
+if [[ "$HELM2CURRENT" != "$HELM2VERSION" ]]; then
+	echo "Reconciling Helm2 from $HELM2CURRENT to $HELM2VERSION"
+	mkdir -p /tmp/helm2
+	curl -sSL https://get.helm.sh/helm-${HELM2VERSION}-linux-amd64.tar.gz |
+	tar -zxv -C /tmp/helm2 linux-amd64/helm
+	mv /tmp/helm2/linux-amd64/helm "$HELM2"
+	chmod +x "$HELM2"
+else
+	echo "Already at Helm v2 ($HELM2VERSION)."
+fi
+
+if [[ "$HELM3CURRENT" != "$HELM3VERSION" ]]; then
+	echo "Reconciling Helm3 from $HELM3CURRENT to $HELM3VERSION"
+	mkdir -p /tmp/helm3
+	curl -sSL https://get.helm.sh/helm-${HELM3VERSION}-linux-amd64.tar.gz |
+	tar -zxv -C /tmp/helm3 linux-amd64/helm
+	mv /tmp/helm3/linux-amd64/helm "$HELM3"
+	chmod +x "$HELM3"
+else
+	echo "Already at Helm v3 ($HELM3VERSION)."
+fi
+
+# Prefer helm3 as default helm command
+ln -sf "$HELM3" "$HOME/.bin/helm"
+
+# Shell completion
+"$HELM3" completion zsh > "$HOME/.config/zsh/completions/_helm"

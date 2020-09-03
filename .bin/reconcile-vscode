@@ -1,0 +1,88 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install vscode here
+DEST="/usr/lib"
+CODE="$DEST/code/bin/code"
+LINK="/bin/code"
+
+URL="https://code.visualstudio.com/sha/download?build=stable&os=linux-x64"
+
+# Version online
+CODEVERSION="$(curl --head -s "$URL" | grep "^Location:" | sed -r 's|.*stable/(.*)/code.*|\1|g')"
+
+# Install if it's not the current version
+if [[ ! $($CODE --version) =~ $CODEVERSION ]]; then
+	cd "$(mktemp -d)"
+	curl -sSL "$URL" | tar -xz
+	mv VSCode-linux-x64 code
+	sudo rm -Rf "$DEST/code"
+	sudo mv code "$DEST"
+	echo "Reconciled to vscode $CODEVERSION"
+else
+	echo "Already on vscode $CODEVERSION"
+fi
+
+# Setup link
+if [[ ! -x "$LINK" ]]; then
+	ln -s $CODE $LINK
+fi
+
+# Extensions to install
+declare -a EXTENSIONS
+EXTENSIONS=(
+	cschleiden.vscode-github-actions
+	eamodio.gitlens
+	EditorConfig.EditorConfig
+	GitHub.codespaces
+	GitHub.github-vscode-theme
+	GitHub.vscode-pull-request-github
+	golang.go
+	hashicorp.terraform
+	jock.svg
+	ms-azuretools.vscode-docker
+	ms-kubernetes-tools.vscode-aks-tools
+	ms-kubernetes-tools.vscode-kubernetes-tools
+	ms-python.python
+	ms-python.vscode-pylance
+	ms-toolsai.jupyter
+	ms-vscode-remote.remote-containers
+	ms-vscode.azure-account
+	ms-vscode.cpptools
+	ms-vsliveshare.vsliveshare
+	ms-vsliveshare.vsliveshare-audio
+	ms-vsliveshare.vsliveshare-pack
+	redhat.vscode-commons
+	redhat.vscode-yaml
+	rust-lang.rust
+	samuelcolvin.jinjahtml
+	timonwong.shellcheck
+	tsandall.opa
+)
+INSTALLED=$(code --list-extensions)
+for extension in "${EXTENSIONS[@]}"; do
+	if [[ ! $INSTALLED =~ $extension ]]; then
+		$LINK --install-extension "$extension"
+	fi
+	echo "[ OK ] $extension"
+done
+
+if [[ -x "$(command -v helm)" ]]; then
+	mkdir -p "$HOME/.vs-kubernetes/tools/helm/linux-amd64"
+	rm -f "$HOME/.vs-kubernetes/tools/helm/linux-amd64/helm"
+	ln -s "$(command -v helm)" "$HOME/.vs-kubernetes/tools/helm/linux-amd64/helm"
+fi
+
+# Setup desktop app
+if [[ ! -f ~/.local/share/applications/code.desktop ]]; then
+	cat <<-EOF > ~/.local/share/applications/code.desktop
+		[Desktop Entry]
+		Version=1.0
+		Terminal=false
+		Type=Application
+		Name=Code
+		Icon=$DEST/code/resources/app/resources/linux/code.png
+		Exec="$CODE" "--no-sandbox" "--unity-launch" "%F"
+	EOF
+fi

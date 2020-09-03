@@ -1,0 +1,20 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install Open Policy Agent Conftest here
+CONFTEST="$HOME/.bin/conftest"
+
+# Version online
+URL="https://github.com/open-policy-agent/conftest/releases"
+VERSION="$(curl --head -s "${URL}/latest" | grep -i "^Location:" | grep -oe '[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')"
+
+# Install if it's not the current version
+if [[ ! $($CONFTEST --version) =~ $VERSION ]]; then
+	VERSIONURL="${URL}/download/v${VERSION}/conftest_${VERSION}_Linux_x86_64.tar.gz"
+	(cd "$(mktemp -d)" && curl -sSL "$VERSIONURL" | tar -xz && mv conftest "$CONFTEST")
+	chmod +x "$CONFTEST"
+	echo "Reconciled Conftest $VERSION."
+else
+	echo "Already have Conftest $VERSION."
+fi

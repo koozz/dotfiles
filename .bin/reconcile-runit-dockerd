@@ -1,0 +1,47 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Only configure when runit command is available
+if [[ ! -x "$(command -v runit)" ]]; then
+	echo "No runit found on the system. Aborting."
+	exit 1
+fi
+
+# Ensure dockerd is installed
+if [[ ! -x "$(command -v dockerd)" ]]; then
+	echo "Could not find dockerd."
+	exit 1
+fi
+
+# Create a service dir for dockerd
+SERVICE_DIR="/etc/sv/dockerd"
+sudo mkdir -p "${SERVICE_DIR}"
+
+# Write the run script for dockerd
+sudo touch "${SERVICE_DIR}/run"
+sudo chmod +x "${SERVICE_DIR}/run"
+echo "▼ ${SERVICE_DIR}/run"
+cat <<EOF | sudo tee "${SERVICE_DIR}/run"
+#!/bin/sh
+exec 2>&1
+
+exec dockerd
+EOF
+echo
+
+# Write a logger run script for dockerd
+sudo mkdir -p "${SERVICE_DIR}/log"
+sudo touch "${SERVICE_DIR}/log/run"
+sudo chmod +x "${SERVICE_DIR}/log/run"
+echo "▼ ${SERVICE_DIR}/log/run"
+cat <<EOF | sudo tee "${SERVICE_DIR}/log/run"
+#!/bin/sh
+exec svlogd -tt .
+EOF
+echo
+
+# Install the dockerd service
+if [[ ! -L /var/service/dockerd ]]; then
+	sudo ln -s "${SERVICE_DIR}" "/var/service/"
+fi

@@ -1,0 +1,44 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install Linkerd here
+LINKERD2="$HOME/.bin/linkerd"
+
+# Version online
+URL="https://github.com/linkerd/linkerd2/releases"
+LINKERD2_VERSION="$(curl --head -s "${URL}/latest" | grep -i "^Location:" | grep -oe 'stable-[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')"
+
+# Get the current version
+LINKERD2_CURRENT=""
+if [[ -x "$LINKERD2" ]]; then
+	LINKERD2_CURRENT="$($LINKERD2 version --short --client)"
+fi
+
+# Install if not the required version
+if [[ "$LINKERD2_CURRENT" != "$LINKERD2_VERSION" ]]; then
+	echo "Reconciling linkerd from $LINKERD2_CURRENT to $LINKERD2_VERSION"
+	DOWNLOAD="${URL}/download/${LINKERD2_VERSION}/linkerd2-cli-${LINKERD2_VERSION}-linux-amd64"
+
+	if [ ! -f "/tmp/linkerd2-cli" ]; then
+		curl -sfLo "/tmp/linkerd2-cli" "${DOWNLOAD}"
+	fi
+	SHA=$(curl -sfL "${DOWNLOAD}.sha256")
+	CHK=$(sha256sum --tag /tmp/linkerd2-cli | sed -e 's/^.* //')
+
+	if [ "$SHA" == "$CHK" ]; then
+		chmod +x /tmp/linkerd2-cli
+		mv /tmp/linkerd2-cli "$LINKERD2"
+		rm -f /tmp/linkerd2-cli
+	else
+		echo "Checksum validation failed." >&2
+		echo "- SHA downloaded: $SHA"
+		echo "- SHA calculated: $CHK"
+    exit 1
+	fi
+else
+	echo "Linkerd already on version: $LINKERD2_CURRENT"
+fi
+
+# Shell completion
+"$LINKERD2" completion zsh > "$HOME/.config/zsh/completions/_linkerd"

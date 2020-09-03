@@ -1,0 +1,94 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Configure spotify user name here
+SPOTIFY_USER="koozz"
+
+# Only configure when runit command is available
+if [[ ! -x "$(command -v runit)" ]]; then
+	echo "No runit found on the system. Aborting."
+	exit 1
+fi
+
+# Ensure spotifyd is installed
+if [[ ! -x "$(command -v spotifyd)" ]]; then
+	# VoidLinux
+	if [[ -x "$(command -v xbps-install)" ]]; then
+		sudo xbps-install -S spotifyd
+		# also install gnome-keyring
+	
+	# Not supported
+	else
+		echo "Could not install spotifyd."
+		exit 1
+	fi
+fi
+
+# Create a service dir for spotifyd
+SERVICE_DIR="/etc/sv/spotifyd"
+sudo mkdir -p "${SERVICE_DIR}"
+
+# Write the run script for spotifyd
+sudo touch "${SERVICE_DIR}/run"
+sudo chmod +x "${SERVICE_DIR}/run"
+echo "▼ ${SERVICE_DIR}/run"
+cat <<EOF | sudo tee "${SERVICE_DIR}/run"
+#!/bin/sh
+exec 2>&1
+
+USER="${USER}"
+HOME="${HOME}"
+GROUPS="\$(id -Gn "\$USER" | tr ' ' ':')"
+DISPLAY=":0"
+
+# export \$USER and \$HOME because some services may not work without them
+export USER
+export HOME
+export DISPLAY
+
+exec chpst -u "\$USER:\$GROUPS" /usr/bin/spotifyd --config-path=\$HOME/.config/spotifyd/spotifyd.conf --no-daemon
+EOF
+echo
+
+# Write a logger run script for spotifyd
+sudo mkdir -p "${SERVICE_DIR}/log"
+sudo touch "${SERVICE_DIR}/log/run"
+sudo chmod +x "${SERVICE_DIR}/log/run"
+echo "▼ ${SERVICE_DIR}/log/run"
+cat <<EOF | sudo tee "${SERVICE_DIR}/log/run"
+#!/bin/sh
+exec svlogd -tt .
+EOF
+echo
+
+# Ensure the config file is present
+echo "▼ ${HOME}/.config/spotifyd/spotifyd.conf"
+mkdir -p "${HOME}/.config/spotifyd"
+touch "${HOME}/.config/spotifyd/spotifyd.conf"
+mkdir -p "${HOME}/.spotify_cache"
+cat <<EOF | tee "${HOME}/.config/spotifyd/spotifyd.conf"
+[global]
+username = "${SPOTIFY_USER}"
+use_keyring = true
+use_mpris = true
+backend = "alsa"
+device_name = "Spotify Daemon"
+bitrate = 320
+cache_path = "${HOME}/.spotify_cache"
+no_audio_cache = false
+zeroconf_port = 1234
+device_type = "computer"
+EOF
+
+# Ensure the password is stored in the keyring
+SECRET_PATH=(application rust-keyring service spotifyd username "${SPOTIFY_USER}")
+if ! secret-tool lookup "${SECRET_PATH[@]}" 1>/dev/null; then
+	echo "Please enter your Spotify password to be entered in the keyring: "
+	secret-tool store --label="Spotify $SPOTIFY_USER" "${SECRET_PATH[@]}"
+fi
+
+# Install the spotifyd service
+if [[ ! -L /var/service/spotifyd ]]; then
+	sudo ln -s "${SERVICE_DIR}" "/var/service/"
+fi

@@ -1,0 +1,33 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Only configure when runit command is available
+if [[ -x "$(command -v runit)" ]] && [[ -d $HOME/.runit ]]; then
+	# On VoidLinux perform:
+	# sudo xbps-install -S socklog socklog-void
+	# sudo usermod -a -G socklog $USER
+
+	# Create a service dir for current user
+	sudo mkdir -p "/etc/sv/runsvdir-$USER"
+
+	# Write the runsvdir script for current user
+	cat <<-EOF | sudo tee "/etc/sv/runsvdir-$USER/run"
+	#!/bin/sh
+
+	# export \$USER and \$HOME because some services may not work without them
+	export USER="${USER}"
+	export HOME="${HOME}"
+
+	# Lookup groups and the user services folder
+	GROUPS="\$(id -Gn "\$USER" | tr ' ' ':')"
+	SVCDIR="\$HOME/.runit"
+
+	# Use chpst to start a new runsvdir process as the specified user
+	exec chpst -u "\$USER:\$GROUPS" runsvdir "\$SVCDIR"
+	EOF
+
+	# Ensure it is executable and link it as a service
+	sudo chmod +x "/etc/sv/runsvdir-$USER/run"
+	sudo ln -s "/etc/sv/runsvdir-$USER" "/var/service/"
+fi

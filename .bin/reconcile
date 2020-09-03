@@ -1,0 +1,21 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+DOTBIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+(
+	cd "$DOTBIN_DIR"
+	
+	if [[ -x "$(command -v bat)" ]]; then
+		VIEWER="bat --language=bash --style=numbers --color=always"
+	else
+		VIEWER="cat"
+	fi
+	
+	SELECTED="$(find . -name 'reconcile-*' | sort | sed -e 's|^./reconcile-||g' |
+		fzf --tac --preview "$VIEWER reconcile-{}" --preview-window=right:80% --exit-0)"
+	if [[ -n "$SELECTED" ]]; then
+		basename "reconcile-$SELECTED"
+		bash "reconcile-$SELECTED"
+	fi
+)

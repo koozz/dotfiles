@@ -1,0 +1,102 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+if [[ -x "$(command -v pacman)" ]]; then
+	# Refresh update package manager first
+	DOTBIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+	(cd "$DOTBIN_DIR" && ./reconcile-arch-system)
+
+	# Packages arrays pacman & AUR
+	declare -a PACKAGES
+	declare -a PACKAGES_AUR
+
+	# Pacman packages
+	PACKAGES=(
+		alsa-utils
+		bat
+		bcc
+		bcc-tools
+		bluez
+		bluez-utils
+		crun
+		dhall
+		dhall-lsp-server
+		dhall-yaml
+		discord
+		element-desktop
+		exa
+		fd
+		fzf
+		git
+		github-cli
+		gnome-bluetooth
+		go
+		gzip
+		jack2
+		jq
+		k9s
+		man-db
+		man-pages
+		mosh
+		nodejs
+		obs-studio
+		openra
+		pandoc
+		podman
+		python
+		python-bcc
+		qjackctl
+		ripgrep
+		rustup
+		sc3-plugins
+		sd
+		shellcheck
+		sof-firmware
+		steam
+		supercollider
+		tar
+		tcpdump
+		terraform
+		texlive-most
+		tmux
+		ttf-jetbrains-mono
+		v4l-utils
+		v4l2loopback-dkms
+		vim
+		wireguard-tools
+		yarn
+		zsh
+		zsh-completions
+	)
+
+	# AUR packages
+	PACKAGES_AUR=(
+		direnv
+		git-delta
+		mgit
+		procs
+		rehex
+		teams
+		spotify
+		stern
+		visual-studio-code-bin
+		ytop
+	)
+
+	# Install packages through pacman
+	sudo pacman -S --noconfirm "${PACKAGES[@]}"
+
+	# Install yay if not installed
+	if [[ ! -x "$(command -v yay)" ]]; then
+		(
+			pacman -S --needed git base-devel
+			git clone https://aur.archlinux.org/yay.git /tmp/yay
+			cd /tmp/yay
+			makepkg -si
+		)
+	fi
+
+	# Install packages through yay
+	yay -S --noconfirm "${PACKAGES_AUR[@]}"
+fi

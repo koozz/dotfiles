@@ -1,0 +1,12 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+if [[ -x "$(command -v pacman)" ]]; then
+	if [[ ! -x "$(command -v reflector)" ]]; then
+		sudo pacman -S reflector
+	fi
+	sudo reflector --country Netherlands --protocol https --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
+	sudo pacman -Syyu
+fi
+

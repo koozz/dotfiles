@@ -1,0 +1,24 @@
+[user]
+	name = Jan van den Berg
+	email = koozz@linux.com
+	signingKey = F947551140E3E3AEA88DF42EF3E00581540BC8D6
+[commit]
+	gpgSign = true
+[credential]
+	helper = cache --timeout=7200
+[init]
+	defaultBranch = main
+[gpg]
+	program = gpg2
+[gpgv]
+	program = gpgv2
+[pull]
+	rebase = true
+[push]
+	default = current
+	gpgSign = if-asked
+[rebase]
+	autoStash = true
+[tag]
+	forceSignAnnotated = true
+

@@ -1,0 +1,49 @@
+# My personal defaults
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+# Tab is my style (1 indent level = 1 indent character)
+# Your editor can show the indentation as wide as you want!
+indent_style = tab
+indent_size = 2
+
+# Elm is strict on whitespace
+[*.elm]
+indent_style = space
+indent_size = 4
+
+[*.java]
+indent_style = space
+indent_size = 4
+
+[*.js]
+indent_style = space
+indent_size = 2
+
+[*.json]
+indent_style = space
+indent_size = 2
+
+[*.md]
+indent_style = space
+indent_size = 4
+
+[Makefile]
+indent_style = tab
+indent_size = 4
+
+[*.rs]
+indent_style = space
+indent_size = 4
+
+[*.tf]
+indent_style = space
+indent_size = 2
+
+# Yaml
+[{*.yml,*.yml.j2,*.yaml,*.yaml.j2}]
+indent_style = space
+indent_size = 2

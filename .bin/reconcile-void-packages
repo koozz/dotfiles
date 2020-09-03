@@ -1,0 +1,108 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Only run if Voidlinux' package manager is available
+if [[ -x "$(command -v xbps-install)" ]]; then
+	# Declare arrays
+	declare -a REPOSITORIES
+	declare -a PACKAGES
+
+	# Voidlinux repositories to draw from
+	REPOSITORIES=(
+		void-repo-nonfree
+		void-repo-multilib
+		void-repo-multilib-nonfree
+	)
+
+	# Voidlinux packages to install
+	PACKAGES=(
+		NetworkManager
+		NetworkManager-openconnect
+		autoconf
+		automake
+		bash
+		bat
+		bcc
+		bcc-devel
+		bcc-tools
+		bind-utils
+		bin-utils
+		bluez
+		bluez-alsa
+		bpftool
+		bpftrace
+		bsdtar
+		busybox
+		c
+		coreutils
+		cpio
+		cronie
+		curl
+		dejavu-fonts-ttf
+		delta
+		direnv
+		element-desktop
+		entr
+		exa
+		fd
+		ffmpeg
+		firefox
+		font-fira-ttf
+		fzf
+		gcc
+		gimp
+		git
+		gnome-bluetooth
+		go
+		gpgme
+		hicolor-icon-theme
+		jq
+		k9s
+		libgcc-32bit libstdc++-32bit libdrm-32bit libglvnd-32bit mesa-dri-32bit
+		m4
+		make
+		man-db
+		man-pages
+		mosh
+		nerd-fonts
+		openconnect
+		openra
+		procs
+		python3
+		python3-bcc
+		qjackctl
+		ripgrep
+		rpmextract
+		rustup
+		shellcheck
+		sof-firmware
+		spotify-qt
+		spotifyd
+		steam
+		stern
+		tar
+		tcpdump
+		terraform
+		traceroute
+		tree
+		up
+		vim
+		wget
+		xtools
+		yarn
+		ytop
+		zsh
+		zsh-completions
+	)
+
+	for repository in "${REPOSITORIES[@]}"; do
+		sudo xbps-install --yes "$repository"
+	done
+
+	for package in "${PACKAGES[@]}"; do
+		sudo xbps-install --yes "$package"
+	done
+	
+	xcheckrestart
+fi

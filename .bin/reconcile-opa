@@ -1,0 +1,11 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install Open Policy Agent here
+OPA="$HOME/.bin/opa"
+
+# Install
+echo "Reconciling Open Policy Agent"
+curl -sfLo "$OPA" "https://openpolicyagent.org/downloads/latest/opa_linux_amd64"
+chmod +x "$OPA"

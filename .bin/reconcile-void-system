@@ -1,0 +1,10 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+if [[ -x "$(command -v xbps-install)" ]]; then
+	sudo xbps-install -Su
+	# if xbps updates itself, need to run a second:
+	#xbps-install -Su
+	xcheckrestart
+fi

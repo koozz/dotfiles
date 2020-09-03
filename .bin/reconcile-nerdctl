@@ -1,0 +1,26 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install kubectl here
+NERDCTL="$HOME/.bin/nerdctl"
+
+# Version online
+URL="https://github.com/containerd/nerdctl/releases"
+NERDVERSION="$(curl --head -s "${URL}/latest" | grep -i "^Location:" | grep -oe '[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')"
+
+# Get the current version
+NERDCURRENT=""
+if [[ -x "$NERDCTL" ]]; then
+	NERDCURRENT=$($NERDCTL version --client-only | grep -oe '[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')
+fi
+
+# Install if not the required version
+if [[ "$NERDCURRENT" != "$NERDVERSION" ]]; then
+	echo "Reconciling nerdctl from $NERDCURRENT to $NERDVERSION"
+	curl -sSL "${URL}/download/v${NERDVERSION}/nerdctl-${NERDVERSION}-linux-amd64.tar.gz" |
+	tar -zxv -C "$HOME/.bin" nerdctl
+	chmod +x "$NERDCTL"
+else
+	echo "Already at $NERDVERSION."
+fi

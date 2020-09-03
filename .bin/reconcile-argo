@@ -1,0 +1,28 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install Argo here
+ARGO="$HOME/.bin/argocd"
+
+# Version online
+URL="https://github.com/argoproj/argo-cd/releases"
+ARGOVERSION="$(curl --head -s "${URL}/latest" | grep -i "^Location:" | grep -oe 'v[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')"
+
+# Get the current version
+ARGOCURRENT=""
+if [[ -x "$ARGO" ]]; then
+	ARGOCURRENT=$($ARGO version --client --short | grep -oe 'v[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')
+fi
+
+# Install if not the required version
+if [[ "$ARGOCURRENT" != "$ARGOVERSION" ]]; then
+	echo "Reconciling Argo from $ARGOCURRENT to $ARGOVERSION"
+  curl -sSL -o "$ARGO" "${URL}/download/${ARGOVERSION}/argocd-linux-amd64"
+	chmod +x "$ARGO"
+else
+	echo "Already at Argo ($ARGOVERSION)."
+fi
+
+# Shell completion
+"$ARGO" completion zsh > "$HOME/.config/zsh/completions/_argocd"

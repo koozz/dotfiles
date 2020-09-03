@@ -1,0 +1,21 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Teams manually checked version
+CURRENTVERSION="1.4.00.13653"
+
+# Version online
+URL="https://teams.microsoft.com/downloads/desktopurl?env=production&plat=linux&arch=x64&download=true&linuxArchiveType=rpm"
+VERSION="$(curl --head -Ls "${URL}" | grep -i "^Location:" | sed -e 's|^.*/||')"
+
+# Install if not the required version
+if [[ ! -x /bin/teams ]] || [[ ! "$VERSION" =~ $CURRENTVERSION ]]; then
+	echo "Reconciling Teams to version: $VERSION"
+	curl -sfLo teams.rpm "${URL}"
+	sudo mv teams.rpm /
+	(cd / && sudo rpmextract teams.rpm)
+	echo "Update, please update reconcile script with newer version '$VERSION'."
+else
+	echo "Teams already at version: $CURRENTVERSION."
+fi

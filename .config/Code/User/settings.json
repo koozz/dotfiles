@@ -1,0 +1,67 @@
+{
+  "editor.fontFamily": "'JetBrains Mono', monospace",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "modifications",
+  "editor.minimap.enabled": false,
+  "editor.multiCursorModifier": "ctrlCmd",
+  "editor.mouseWheelZoom": true,
+  "editor.quickSuggestions": {
+    "other": false,
+    "comments": false,
+    "strings": false
+  },
+  "editor.renderWhitespace": "trailing",
+  "editor.rulers": [
+    80,
+    120
+  ],
+  "editor.suggestSelection": "first",
+  "files.autoSave": "onFocusChange",
+  "files.exclude": {
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true
+  },
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "git.autofetch": true,
+  "gitlens.codeLens.authors.enabled": false,
+  "gitlens.codeLens.recentChange.enabled": false,
+  "go.formatTool": "gofmt",
+  "go.useLanguageServer": true,
+  "html.format.wrapLineLength": 150,
+  "python.showStartPage": false,
+  "rust.all_features": true,
+  "rust.rustfmt_path": "$HOME/.cargo/bin/rustfmt",
+  "rust-client.engine": "rust-analyzer",
+  "rust-client.updateOnStartup": true,
+  "telemetry.enableCrashReporter": false,
+  "telemetry.enableTelemetry": false,
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.fontFamily": "'JetBrains Mono', monospace",
+  "terminal.integrated.fontSize": 15,
+  "vs-kubernetes": {
+    "vs-kubernetes.helm-path.linux": "/home/jan/.bin/helm",
+    "vs-kubernetes.kubectl-path.linux": "/home/jan/.bin/kubectl",
+    "vs-kubernetes.kubeconfig": "/home/jan/.kube/config"
+  },
+  "window.openFoldersInNewWindow": "on",
+  "window.newWindowDimensions": "maximized",
+  "window.title": "${dirty}${activeEditorMedium}",
+  "window.zoomLevel": -1,
+  "workbench.startupEditor": "newUntitledFile",
+  "yaml.schemas": {
+    "Kubernetes": "*.yaml"
+  },
+  "[elm]": {
+    "editor.formatOnSave": true
+  },
+  "[latex]": {
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "editor.suggestSelection": "recentlyUsedByPrefix"
+  }
+}

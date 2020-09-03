@@ -1,0 +1,16 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install az cli if missing
+if [[ ! -x "$(command -v az)" ]]; then
+	curl -L https://aka.ms/InstallAzureCli | bash
+fi
+
+# Enable auto upgrade if not enabled
+if ! az config get auto-upgrade.enable 1>/dev/null 2>&1; then
+	az config set auto-upgrade.enable=yes --only-show-errors
+fi
+
+# Force upgrade now
+az upgrade

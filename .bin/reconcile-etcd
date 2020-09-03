@@ -1,0 +1,27 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install etcdctl here
+ETCDCTL="$HOME/.bin/etcdctl"
+ETCDVERSION=v3.4.14
+
+# Get current version
+ETCDCURRENT=""
+if [[ -x "$ETCDCTL" ]]; then
+	ETCDCURRENT="v$($ETCDCTL version | grep "etcdctl version" | grep -oe '[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')"
+fi
+
+# Install if not the required version
+if [[ "$ETCDCURRENT" != "$ETCDVERSION" ]]; then
+	TMP="/tmp/etcd-${ETCDVERSION}-linux-amd64"
+
+	curl -sfLO ${TMP}.tar.gz https://storage.googleapis.com/etcd/${ETCDVERSION}/etcd-${ETCDVERSION}-linux-amd64.tar.gz
+	mkdir -p "${TMP}"
+	tar xzf "${TMP}.tar.gz" -C ${TMP} --strip-components=1
+	mv ${TMP}/etcdctl "$ETCDCTL"
+	rm -Rf ${TMP}*
+	$ETCDCTL version
+else
+	echo "Etcdctl already on version: $ETCDCURRENT"
+fi

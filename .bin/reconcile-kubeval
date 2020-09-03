@@ -1,0 +1,16 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install kubectl here
+KUBEVAL="$HOME/.bin/kubeval"
+URL="https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz"
+
+# Install kubeval
+if [[ ! -x "$KUBEVAL" ]]; then
+	(
+		TMP=$(mktemp -d); cd "$TMP"
+		curl -sSL "$URL" | tar -zx kubeval
+		mv "$TMP/kubeval" "$KUBEVAL"
+	)
+fi

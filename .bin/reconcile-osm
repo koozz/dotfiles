@@ -1,0 +1,19 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install Open Service Mesh here
+OSM="$HOME/.bin/osm"
+
+# Version online
+URL="https://github.com/openservicemesh/osm/releases"
+OSMVERSION="$(curl --head -s "${URL}/latest" | grep -i "^Location:" | grep -oe 'v[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')"
+
+# Install if it's not the current version
+if [[ ! $($OSM version) =~ $OSMVERSION ]]; then
+	VERSIONURL="${URL}/download/${OSMVERSION}/osm-${OSMVERSION}-linux-amd64.tar.gz"
+	(cd "$(mktemp -d)" && curl -sSL "$VERSIONURL" | tar -xz && mv linux-amd64/osm "$OSM")
+	echo "Reconciled osm $OSMVERSION."
+else
+	echo "Already have osm $OSMVERSION."
+fi

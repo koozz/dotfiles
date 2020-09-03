@@ -1,0 +1,28 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install kubectl here
+KUBECTL="$HOME/.bin/kubectl"
+KUBEVERSION="$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)"
+
+# Get the current version
+KUBECURRENT=""
+if [[ -x "$KUBECTL" ]]; then
+	KUBECURRENT=$($KUBECTL version --client --short | grep -oe 'v[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')
+elif [[ -x "$(command -v kubectl)" ]]; then
+	KUBECURRENT=$(kubectl version --client --short | grep -oe 'v[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')
+fi
+
+# Install if not the required version
+if [[ "$KUBECURRENT" != "$KUBEVERSION" ]]; then
+	echo "Reconciling kubectl from $KUBECURRENT to $KUBEVERSION"
+	curl -sfLo "$KUBECTL" "https://storage.googleapis.com/kubernetes-release/release/$KUBEVERSION/bin/linux/amd64/kubectl"
+	chmod +x "$KUBECTL"
+	mkdir -p "$HOME/.config/zsh/completions"
+else
+	echo "Already at $KUBEVERSION."
+fi
+
+# Shell completion
+"$KUBECTL" completion zsh > "$HOME/.config/zsh/completions/_kubectl"

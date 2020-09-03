@@ -1,0 +1,23 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install Flux here
+FLUX="$HOME/.bin/flux"
+FLUXVERSION="0.7.7"
+
+# Get the current version
+FLUXCURRENT=""
+if [[ -x "$FLUX" ]]; then
+	FLUXCURRENT=$($FLUX --version | grep -oe '[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')
+fi
+
+# Install if not the required version
+if [[ "$FLUXCURRENT" != "$FLUXVERSION" ]]; then
+	echo "Reconciling Flux from $FLUXCURRENT to $FLUXVERSION"
+	curl -sSL https://github.com/fluxcd/flux2/releases/download/v${FLUXVERSION}/flux_${FLUXVERSION}_linux_amd64.tar.gz |
+	tar -zxv -C "$HOME/.bin"
+	chmod +x "$FLUX"
+else
+	echo "Already at Flux ($FLUXVERSION)."
+fi

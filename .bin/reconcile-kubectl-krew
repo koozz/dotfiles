@@ -1,0 +1,63 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+KREW="$HOME/.krew/bin/kubectl-krew"
+
+if [[ ! -x "$(command -v $KREW)" ]]; then
+	(
+		set -x; cd "$(mktemp -d)" &&
+		curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" &&
+		tar zxvf krew.tar.gz &&
+		KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/')" &&
+		"$KREW" install krew
+	)
+fi
+
+# Update and upgrade existing plugins
+$KREW update
+$KREW upgrade
+
+# Krew plugins
+declare -a PLUGINS
+PLUGINS=(
+	access-matrix
+	capture
+	cert-manager
+	config-cleanup
+	cssh
+	ctx
+	doctor
+	grep
+	node-admin
+	node-shell
+	np-viewer
+	ns
+	outdated
+	podevents
+	popeye
+	preflight
+	psp-util
+	rbac-lookup
+	rbac-view
+	reap
+	resource-capacity
+	resource-snapshot
+	roll
+	score
+	service-tree
+	sick-pods
+	status
+	support-bundle
+	tail
+	trace
+	tree
+	unused-volumes
+	view-allocations
+	view-cert
+	view-secret
+	view-utilization
+)
+for plugin in "${PLUGINS[@]}"; do
+	$KREW install $plugin
+done

@@ -1,0 +1,29 @@
+#!/bin/bash
+# vim:ft=bash ts=2 sw=2 sts=2 fenc=utf-8
+set -euo pipefail
+
+# Install istioctl here
+ISTIOCTL="$HOME/.bin/istioctl"
+ISTIOVERSION="$(curl -sL https://github.com/istio/istio/releases | \
+                grep -o 'releases/[0-9]*.[0-9]*.[0-9]*/' | sort --version-sort | \
+                tail -1 | awk -F'/' '{ print $2}')"
+
+# Get the current version
+ISTIOCURRENT=""
+if [[ -x "$ISTIOCTL" ]]; then
+	ISTIOCURRENT="$($ISTIOCTL version --short | grep -oe '[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*')"
+fi
+
+# Install if not the required version
+if [[ "$ISTIOCURRENT" != "$ISTIOVERSION" ]]; then
+	TMP="/tmp/istio-${ISTIOVERSION}-linux-amd64"
+
+	curl -sfLo "${TMP}.tar.gz" "https://github.com/istio/istio/releases/download/${ISTIOVERSION}/istio-${ISTIOVERSION}-linux-amd64.tar.gz"
+	mkdir -p "${TMP}"
+	tar xzf "${TMP}.tar.gz" -C "${TMP}" --strip-components=1
+	mv "${TMP}/bin/istioctl" "$ISTIOCTL"
+	rm -Rf "${TMP}*"
+	echo "Istioctl $($ISTIOCTL version --short | grep -oe '[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]*') installed."
+else
+	echo "Already at $ISTIOVERSION."
+fi
