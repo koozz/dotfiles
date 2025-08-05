@@ -1,0 +1,17 @@
+#!/bin/bash
+TMUX="$(command -v tmux || echo "/opt/homebrew/bin/tmux")"
+FISH="$(command -v fish || echo "/opt/homebrew/bin/fish")"
+BASH="$(command -v bash || echo "/opt/homebrew/bin/bash")"
+
+if [[ -x "${TMUX}" ]]; then
+  "${TMUX}" list-sessions && (
+    "${TMUX}" run "${TMUX} choose-session"
+    "${TMUX}" attach-session
+  ) || "${TMUX}" new-session -s MacMountain
+elif [[ -x "${FISH}" ]]; then
+  "${FISH}"
+elif [[ -x "${BASH}" ]]; then
+  "${BASH}"
+else
+  /bin/bash
+fi
