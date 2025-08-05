@@ -1,0 +1,2 @@
+#!/bin/sh
+ssh-add -t 7200 ~/.ssh/id_ed25519
