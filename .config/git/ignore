@@ -1,0 +1,6 @@
+.DS_Store
+.localized
+.journal.log
+.venv
+node_modules
+.terraform.lock.hcl
