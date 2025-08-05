@@ -1,0 +1,95 @@
+[alias]
+  ca = commit --amend --no-edit
+  ds = diff --staged
+  default-branch = !git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@' 2>/dev/null
+  graph = log --graph --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%an%C(reset)%C(bold yellow)%d%C(reset) %C(dim white)- %s%C(reset)' --all
+  hop = !git checkout $(git for-each-ref --format='%(refname:short)' refs/heads/ | fzf)
+  last = log -1 HEAD --patch
+  main = checkout main
+  master = checkout master
+  nope = checkout .
+  prettylog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  pushup = push --set-upstream origin
+  prune-branches = !git remote prune origin && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r git branch -D
+  pushf = push --force-with-lease
+  root = rev-parse --show-toplevel
+  squash = !git reset $(git merge-base main HEAD) && git add -A && git commit
+  trigger = !git commit --allow-empty -m "fix: retrigger automation" && git push
+  undo = reset --soft HEAD^
+  wait = reset HEAD
+  whodunnit = blame -w -C -C -C
+[branch]
+  sort = -committerdate
+[checkout]
+  defaultRemote = origin
+[color]
+  ui = true
+[commit]
+  gpgsign = true
+  template = ~/.config/git/commitmessage
+  verbose = true
+[core]
+  editor = nvim
+  excludesfile = ~/.config/git/ignore
+  untrackedCache = true
+[credential "https://github.com"]
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[diff]
+  algorithm = histogram
+  external = difft
+  renames = true
+  submodule = log
+  tool = difftastic
+[difftool]
+  prompt = false
+[difftool "difftastic"]
+  cmd = difft "$LOCAL" "$REMOTE"
+[fetch]
+  prune = true
+  all = true
+[filter "lfs"]
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+  clean = git-lfs clean -- %f
+[gpg]
+  format = ssh
+[gpg "ssh"]
+  allowedSignersFile = ~/.ssh/allowed_signers
+[help]
+  autocorrect = prompt
+[init]
+  defaultBranch = main
+[merge]
+  conflictstyle = zdiff3
+  tool = nvimdiff
+[pager]
+  difftool = true
+[pull]
+  rebase = true
+[push]
+  autoSetupRemote = true
+  default = current
+  followTags = true
+  gpgSign = if-asked
+[rebase]
+  abbreviateCommands = true
+  autoSquash = true
+  autoStash = true
+  updateRefs = true
+[rerere]
+  autoupdate = true
+  enabled = true
+[status]
+  submoduleSummary = true
+[submodule]
+  recurse = true
+[tag]
+  forceSignAnnotated = true
+  sort = version:refname
+[user]
+  name = Jan van den Berg
+  email = koozz@linux.com
+  signingkey = ~/.ssh/id_ed25519.pub

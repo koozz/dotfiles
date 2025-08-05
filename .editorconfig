@@ -1,0 +1,40 @@
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# Makefile must have tabs
+[Makefile]
+indent_style = tab
+
+# Python
+[*.py]
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+# Rust
+[*.rs]
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+# Shell scripts
+[*.{sh,bash,fish,zsh}]
+indent_style = tab
+indent_size = 4
+
+# YAML (already default, but explicit)
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Zig
+[*.zig]
+indent_style = space
+indent_size = 4

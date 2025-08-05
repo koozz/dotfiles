@@ -1,0 +1,11 @@
+telemetry = false
+
+[test]
+coverageSkipTestFiles = true
+
+[install]
+globalDir = "~/.bun/install/global"
+globalBinDir = "~/.bun/bin"
+
+[run]
+bun = true
