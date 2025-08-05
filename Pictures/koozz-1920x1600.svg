@@ -1,0 +1,33 @@
+<svg width="1920" height="1600"
+     viewBox="0 0 200 200"
+     preserveAspectRatio="xMidYMid"
+	 style="background-color:#333"
+ 	 xmlns="http://www.w3.org/2000/svg">
+
+	<defs>
+		<filter id="shadow">
+			<feDropShadow dx="5" dy="5" stdDeviation="5" flood-color="#333" />
+		</filter>
+        <filter id="spotlight">
+            <feSpecularLighting specularExponent="500" lighting-color="white">
+                <fePointLight x="100" y="100" z="150"/>
+            </feSpecularLighting>
+        </filter>
+    </defs>
+
+    <rect fill="#333" filter="url(#spotlight)" width="100%" height="100%" />
+
+    <g transform="scale(0.25,0.25)
+                  translate(300, 300)">
+        <circle cx="50%" cy="50%" r="90" fill="#08c" />
+        <g transform="rotate(-10,100,100)
+                      scale(0.55,0.55)
+                      translate(85, 85)"
+               style="fill:white;
+                      filter:url(#shadow);">
+            <polygon points="0,0 50,0 50,50 200,200 130,200 0,70" />
+            <polygon points="0,80 60,140 0,200" />
+            <polygon points="130,0 200,0 105,95 70,60" />
+        </g>
+    </g>
+</svg>
