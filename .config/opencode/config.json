@@ -1,0 +1,53 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "disabled_providers": [
+    "amazon-bedrock",
+    "anthropic",
+    "azure",
+    "deepseek",
+    "google",
+    "google-vertex",
+    "groq",
+    "llama",
+    "mistral",
+    "morph",
+    "openai",
+    "openrouter",
+    "vercel",
+    "xai"
+  ],
+  "mcp": {
+    "fetch": {
+      "type": "local",
+      "enabled": true,
+      "command": ["uvx", "mcp-server-fetch"]
+    },
+    "github-local": {
+      "type": "local",
+      "enabled": true,
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "github-remote": {
+      "type": "remote",
+      "enabled": false,
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "zig-docs": {
+      "type": "local",
+      "enabled": true,
+      "command": [
+        "bunx",
+        "zig-mcp@latest",
+        "--version",
+        "master",
+        "--update-policy",
+        "manual"
+      ]
+    }
+  },
+  "share": "disabled",
+  "theme": "tokyonight"
+}
